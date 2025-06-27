@@ -12,32 +12,80 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
+
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const bookList = books ;
+  if(bookList.length > 0){
+    return res.status(200).json(bookList);
+  }else{
+    return res.status(404).json({message:"No books available"});
+  }
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
- });
+
+  const isbn = req.params.isbn;
+
+  // Check if the book with the given ISBN exists
+  if(books[isbn]){
+    const bookDetails = books[isbn];
+    return res.status(200).json(bookDetails);
+  }else{
+    return res.status(404).json({message: "Book not found"});
+  }
+
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  
+  const author = req.params.author;
+  // Check if the author exists in the books
+  if(!author || author.trim() === "") {
+    return res.status(400).json({message: "Author name is required"});
+  }else{
+    // Filter books by author
+    const booksByAuthor = Object.values(books).filter(book => book.author.toLowerCase() === author.toLowerCase());
+    if(booksByAuthor.length > 0){
+      return res.status(200).json(booksByAuthor);
+    }else{
+      return res.status(404).json({message: "No books found for the given author"});
+  }
+}
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const title = req.params.title;
+  if(!title || title.trim() === ""){
+    return res.status(400).json({message: "Title is required"});
+  }else{
+    //Filter Book by title
+    const bookByTitle = Object.values(books).filter(book => book.title.toLowerCase() === title.toLowerCase());
+    if(bookByTitle.length > 0){
+      return res.status(200).json(bookByTitle);
+    }else{
+      return res.status(404).json({message: "No books found for the given title"});
+    }
+  }
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
+    const isbn = req.params.isbn;
+
+    // Check if the book with the given ISBN exists
+    if(books[isbn]){
+        const bookDetails = books[isbn];
+        if(Object.keys(bookDetails.reviews).length >0){
+        return res.status(200).json(bookDetails.reviews);
+      }else{
+        return res.status(404).json({message: "Book not found"});
+      }
+   }else{
+        return res.status(404).json({message: "Book not found"});
+   }
+  });
 
 module.exports.general = public_users;
